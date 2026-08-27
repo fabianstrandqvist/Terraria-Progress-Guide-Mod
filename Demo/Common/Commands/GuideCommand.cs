@@ -17,6 +17,7 @@ namespace Demo.Common.Commands
         private record ProgressionStage(string Name, Func<bool> IsCleared);
 
         public List<StageInfo> Data => ProgressionDataSystem.ProgressionData;
+        public Dictionary<string, int> ItemToIdMap => ProgressionDataSystem.ItemToIdMap;
 
 
         // how do I distinct between Gearing Up and Pre-Bosses?
@@ -63,9 +64,9 @@ namespace Demo.Common.Commands
             caller.Reply("Weapons available:");
             caller.Reply($"Progression stage: {ProgressionCheck()}");
             caller.Reply($"Description: {Data[ProgressionCheck()].Description}");
-            Data[ProgressionCheck()].Classes[0].Boxes.ForEach(box => caller.Reply($"Box title: {box.Title}"));
+            Data[ProgressionCheck()].Classes[0].Boxes.ForEach(box => box.Items.ForEach(item => caller.Reply(
+                ItemToIdMap.ContainsKey(item) ? $"{item} (ID: {ItemToIdMap[item]})" : $"{item} (ID: Not Found)")));
             
-            // weapons[ProgressionCheck()].ToList().ForEach(weapon => caller.Reply(Lang.GetItemNameValue(weapon)));
         }
     }
 
