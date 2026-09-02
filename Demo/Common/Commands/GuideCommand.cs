@@ -64,8 +64,22 @@ namespace Demo.Common.Commands
             caller.Reply("Weapons available:");
             caller.Reply($"Progression stage: {ProgressionCheck()}");
             caller.Reply($"Description: {Data[ProgressionCheck()].Description}");
-            Data[ProgressionCheck()].Classes[0].Boxes.ForEach(box => box.Items.ForEach(item => caller.Reply(
-                ItemToIdMap.ContainsKey(item) ? $"{item} (ID: {ItemToIdMap[item]})" : $"{item} (ID: Not Found)")));
+
+            // this will probably miss recursive children, fix this later!
+            // should i also cache it or something to a dict instead of populating with defalt values etc like now
+
+            // Data[ProgressionCheck()].Classes[0].Boxes.ForEach(box => box.Items.ForEach(item => caller.Reply(
+            //     ItemToIdMap.ContainsKey(item) ? $"{item} (ID: {ItemToIdMap[item]})" : $"{item} (ID: Not Found)")));
+
+            Data[ProgressionCheck()].Classes[0].Boxes.ForEach(box =>
+                box.Items.ForEach(itemId =>
+                {
+                    Item item = new Item();
+                    item.SetDefaults(int.Parse(itemId));
+                    caller.Reply($"{itemId}: {item.Name}");
+                })
+            );
+
             
         }
     }
