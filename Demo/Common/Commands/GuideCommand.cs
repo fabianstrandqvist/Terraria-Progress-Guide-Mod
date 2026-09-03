@@ -37,8 +37,6 @@ namespace Demo.Common.Commands
         
         };
 
-        
-
         protected int ProgressionCheck()
         {
             for (int i = 0; i < stages.Count; i++)
@@ -50,15 +48,46 @@ namespace Demo.Common.Commands
             }
             return -1;
         }
+
+        protected List<InfoBox> GetChildren(InfoBox box)
+        {
+            List<InfoBox> items = new List<InfoBox>();
+            foreach (var child in box.Children)
+            {
+                items.Add(child);
+                items.AddRange(GetChildren(child));
+            }
+            return items;
+        }
+
+        protected void PrintItems(int classIndex, CommandCaller caller)
+        {
+            Data[ProgressionCheck()].Classes[classIndex].Boxes.ForEach(box =>
+            {
+                PrintHelper(box, caller);
+                GetChildren(box).ForEach(child =>
+                {
+                    PrintHelper(child, caller);
+                });
+            });
+        }
+
+        private void PrintHelper(InfoBox box, CommandCaller caller)
+        {
+            caller.Reply($"Equipment: {box.Title}");
+            box.Items.ForEach(itemId =>
+            {
+                Item item = new Item();
+                item.SetDefaults(int.Parse(itemId));
+                caller.Reply($"{itemId}: {item.Name}");
+            });
+        }
     }
     
     public class Melee : GuideCommand
     {
         public override CommandType Type => CommandType.Chat;
         public override string Command => "meleeguide";
-        
-        // another problem is that I can only have one command per class, but there are more than one type of equipment
-        // lets just do weapons for now - i want to build a UI system later so this is ok for now
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             caller.Reply("Weapons available:");
@@ -68,19 +97,7 @@ namespace Demo.Common.Commands
             // this will probably miss recursive children, fix this later!
             // should i also cache it or something to a dict instead of populating with defalt values etc like now
 
-            // Data[ProgressionCheck()].Classes[0].Boxes.ForEach(box => box.Items.ForEach(item => caller.Reply(
-            //     ItemToIdMap.ContainsKey(item) ? $"{item} (ID: {ItemToIdMap[item]})" : $"{item} (ID: Not Found)")));
-
-            Data[ProgressionCheck()].Classes[0].Boxes.ForEach(box =>
-                box.Items.ForEach(itemId =>
-                {
-                    Item item = new Item();
-                    item.SetDefaults(int.Parse(itemId));
-                    caller.Reply($"{itemId}: {item.Name}");
-                })
-            );
-
-            
+            PrintItems(0, caller);
         }
     }
 
@@ -92,6 +109,7 @@ namespace Demo.Common.Commands
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             caller.Reply("Your are ranged");
+            PrintItems(1, caller);
         }
     }
 
@@ -103,6 +121,7 @@ namespace Demo.Common.Commands
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             caller.Reply("Your are magic");
+            PrintItems(2, caller);
         }
     }
 
@@ -114,6 +133,7 @@ namespace Demo.Common.Commands
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             caller.Reply("Your are summoner");
+            PrintItems(3, caller);
         }
     }
 }
