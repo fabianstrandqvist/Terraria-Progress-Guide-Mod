@@ -80,6 +80,26 @@ namespace Demo.Common.Commands
                 Item item = new Item();
                 item.SetDefaults(int.Parse(itemId));
                 caller.Reply($"{itemId}: {item.Name}");
+                
+                // demoing recipes - should obviously be recursive and also consider items that are dropped
+                // tmodloader does not seem to have an easy way to get that though so I will have to use the API for this as well
+                
+                foreach (var recipe in Main.recipe)
+                {
+                    if (recipe.createItem.type == item.type)
+                    {
+                        caller.Reply($"Recipe for {item.Name}:");
+                        foreach (var ingredient in recipe.requiredItem)
+                        {
+                            if (ingredient.type > 0)
+                            {
+                                Item ingredientItem = new Item();
+                                ingredientItem.SetDefaults(ingredient.type);
+                                caller.Reply($"- {ingredient.stack}x {ingredientItem.Name}");
+                            }
+                        }
+                    }
+                }
             });
         }
     }
@@ -94,7 +114,6 @@ namespace Demo.Common.Commands
             caller.Reply($"Progression stage: {ProgressionCheck()}");
             caller.Reply($"Description: {Data[ProgressionCheck()].Description}");
 
-            // this will probably miss recursive children, fix this later!
             // should i also cache it or something to a dict instead of populating with defalt values etc like now
 
             PrintItems(0, caller);
