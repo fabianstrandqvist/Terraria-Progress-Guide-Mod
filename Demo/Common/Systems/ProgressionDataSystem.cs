@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.IO;
 using Terraria;
 using Terraria.ID;
+using Demo.Common.UI;
 
 namespace Demo.Common.Systems
 {
@@ -22,6 +23,9 @@ namespace Demo.Common.Systems
 
             // // Deserialize the JSON into a list of StageInfo objects
             ProgressionData = JsonSerializer.Deserialize<List<StageInfo>>(json);
+
+            // in ProgressionDataSystem.PostSetupContent():
+            GuideUISystem.SomethingUIStatic?.PopulateItems();
     
 
 

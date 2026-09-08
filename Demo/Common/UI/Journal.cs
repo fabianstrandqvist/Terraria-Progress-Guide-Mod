@@ -1,27 +1,85 @@
 using Terraria.UI;
+using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.ModLoader;
+using System.Collections.Generic;
+using Demo.Common.Systems;
+using Demo.Common.DataStructures;
 
 namespace Demo.Common.UI
 {
     internal class JournalUI : UIState
     {
         public static bool visible;
-        public DragableUIPanel panel;
+        public GuidePanel panel;
+        private ItemGrid grid;
+
+        public List<StageInfo> Data => ProgressionDataSystem.ProgressionData;
 
         public override void OnInitialize()
         {
-            // if you set this to true, it will show up in game
-            visible = true;
+            visible = false;
 
-            panel = new DragableUIPanel(); //initialize the panel
-            // ignore these extra 0s
-            panel.Left.Set(800, 0); //this makes the distance between the left of the screen and the left of the panel 500 pixels (somewhere by the middle)
-            panel.Top.Set(100, 0); //this is the distance between the top of the screen and the top of the panel
+            panel = new GuidePanel();
+            panel.Left.Set(500, 0);
+            panel.Top.Set(100, 0);
             panel.Width.Set(100, 0);
             panel.Height.Set(100, 0);
+            Append(panel);
 
-            Append(panel); //appends the panel to the UIState
+            // start with an empty grid — no data access yet
+            grid = new ItemGrid(new List<Item>());
+            grid.Width.Set(0f, 1f);
+            grid.Height.Set(0f, 1f);
+            panel.Append(grid);
+        }
+
+        private List<Item> GetItems()
+        {
+            var items = new List<Item>();
+            Data[0].Classes.ForEach(classInfo =>
+            {
+                classInfo.Boxes.ForEach(box =>
+                {
+                    box.Items.ForEach(itemID =>
+                    {
+                        Item item = new Item();
+                        item.SetDefaults(int.Parse(itemID));
+                        items.Add(item);
+                    });
+                });
+            });
+            return items;
+        }
+
+        public void PopulateItems()
+        {
+            panel.RemoveChild(grid); // clear the old empty grid
+            grid = new ItemGrid(GetItems());
+            grid.Width.Set(0f, 1f);
+            grid.Height.Set(0f, 1f);
+            panel.Append(grid);
+        }
+    }
+
+    internal class LogoUI : UIState
+    {
+        public static bool visible;
+        public GuideIcon icon;
+
+        public override void OnInitialize()
+        {
+            visible = true;
+
+            var texture = ModContent.Request<Texture2D>("Demo/Content/Items/Materials/SteelShard"); // adjust path to your actual PNG location
+            icon = new GuideIcon(texture);
+            icon.Left.Set(700f, 0f);
+            icon.Top.Set(20f, 0f);
+            icon.Width.Set(40f, 0f);
+            icon.Height.Set(40f, 0f);
+
+            Append(icon);
         }
     }
 }

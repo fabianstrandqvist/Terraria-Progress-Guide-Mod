@@ -6,46 +6,63 @@ using Terraria.UI;
 
 namespace Demo.Common.UI
 {
-    public class TerrariaUITutorial : ModSystem
+    public class GuideUISystem : ModSystem
     {
-        internal JournalUI somethingUI;
+        internal static JournalUI SomethingUIStatic;
         public UserInterface somethingInterface;
+
+        internal LogoUI logoUI;
+        public UserInterface logoInterface;
 
         public override void Load()
         {
-            // this makes sure that the UI doesn't get opened on the server
-            // the server can't see UI, can it? it's just a command prompt
             if (!Main.dedServ)
             {
-                somethingUI = new JournalUI();
-                somethingUI.Initialize();
+                SomethingUIStatic = new JournalUI();
+                SomethingUIStatic.Initialize();
                 somethingInterface = new UserInterface();
-                somethingInterface.SetState(somethingUI);
+                somethingInterface.SetState(SomethingUIStatic);
+
+                logoUI = new LogoUI();          
+                logoUI.Initialize();
+                logoInterface = new UserInterface();
+                logoInterface.SetState(logoUI);
             }
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            // it will only draw if the player is not on the main menu
-            if (!Main.gameMenu
-                && JournalUI.visible)
+            if (!Main.gameMenu && JournalUI.visible)
             {
                 somethingInterface?.Update(gameTime);
+            }
+
+            if (!Main.gameMenu && LogoUI.visible)
+            {
+                logoInterface?.Update(gameTime);
             }
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
-            layers.Add(new LegacyGameInterfaceLayer("Cool Mod: Something UI", DrawSomethingUI, InterfaceScaleType.UI));
+            layers.Add(new LegacyGameInterfaceLayer("Demo: Journal UI", DrawSomethingUI, InterfaceScaleType.UI));
+            layers.Add(new LegacyGameInterfaceLayer("Demo: Logo UI", DrawLogoUI, InterfaceScaleType.UI));
         }
 
         private bool DrawSomethingUI()
         {
-            // it will only draw if the player is not on the main menu
-            if (!Main.gameMenu
-                && JournalUI.visible)
+            if (!Main.gameMenu && JournalUI.visible)
             {
                 somethingInterface.Draw(Main.spriteBatch, new GameTime());
+            }
+            return true;
+        }
+
+        private bool DrawLogoUI()
+        {
+            if (!Main.gameMenu && LogoUI.visible)
+            {
+                logoInterface.Draw(Main.spriteBatch, new GameTime());
             }
             return true;
         }
