@@ -50,14 +50,11 @@ namespace Demo.Common.UI
             {
                 foreach (var box in classInfo.Boxes)
                 {
-                    foreach (var itemID in box.Items)
+                    foreach (int itemID in box.Items)
                     {
-                        if (int.TryParse(itemID, out int id))
-                        {
-                            Item item = new Item();
-                            item.SetDefaults(id);
-                            items.Add(item);
-                        }
+                        Item item = new Item();
+                        item.SetDefaults(itemID);
+                        items.Add(item);
                     }
                 }
             }

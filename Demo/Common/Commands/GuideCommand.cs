@@ -78,7 +78,7 @@ namespace Demo.Common.Commands
             box.Items.ForEach(itemId =>
             {
                 Item item = new Item();
-                item.SetDefaults(int.Parse(itemId));
+                item.SetDefaults(itemId);
                 caller.Reply($"{itemId}: {item.Name}");
                 
                 // demoing recipes - should obviously be recursive and also consider items that are dropped

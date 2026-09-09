@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Demo.Common.DataStructures;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.IO;
 using Terraria;
 using Terraria.ID;
@@ -21,8 +22,14 @@ namespace Demo.Common.Systems
             using StreamReader reader = new StreamReader(stream);
             string json = reader.ReadToEnd();
 
-            // // Deserialize the JSON into a list of StageInfo objects
-            ProgressionData = JsonSerializer.Deserialize<List<StageInfo>>(json);
+            // Item IDs are quoted numbers in the JSON ("55"), so allow reading them straight into int
+            var options = new JsonSerializerOptions
+            {
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
+            };
+
+            // Deserialize the JSON into a list of StageInfo objects
+            ProgressionData = JsonSerializer.Deserialize<List<StageInfo>>(json, options);
 
             GuideUISystem.SomethingUIStatic?.PopulateItems();
  
