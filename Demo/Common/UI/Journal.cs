@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Demo.Common.Systems;
 using Demo.Common.DataStructures;
 
+
 namespace Demo.Common.UI
 {
     internal class JournalUI : UIState
@@ -33,34 +34,48 @@ namespace Demo.Common.UI
             grid.Width.Set(0f, 1f);
             grid.Height.Set(0f, 1f);
             panel.Append(grid);
+
+            // thinking to make one grid for each class, that can be tabbed to change
+            // or is it better to just have a single grid then but the item changes?
         }
 
         private List<Item> GetItems()
         {
             var items = new List<Item>();
-            Data[0].Classes.ForEach(classInfo =>
+
+            if (Data == null || Data.Count == 0)
+                return items;
+
+            foreach (var classInfo in Data[0].Classes)
             {
-                classInfo.Boxes.ForEach(box =>
+                foreach (var box in classInfo.Boxes)
                 {
-                    box.Items.ForEach(itemID =>
+                    foreach (var itemID in box.Items)
                     {
-                        Item item = new Item();
-                        item.SetDefaults(int.Parse(itemID));
-                        items.Add(item);
-                    });
-                });
-            });
+                        if (int.TryParse(itemID, out int id))
+                        {
+                            Item item = new Item();
+                            item.SetDefaults(id);
+                            items.Add(item);
+                        }
+                    }
+                }
+            }
+
             return items;
         }
 
+
         public void PopulateItems()
         {
-            panel.RemoveChild(grid); // clear the old empty grid
+            panel.RemoveChild(grid);
+
             grid = new ItemGrid(GetItems());
             grid.Width.Set(0f, 1f);
             grid.Height.Set(0f, 1f);
             panel.Append(grid);
         }
+
     }
 
     internal class LogoUI : UIState
