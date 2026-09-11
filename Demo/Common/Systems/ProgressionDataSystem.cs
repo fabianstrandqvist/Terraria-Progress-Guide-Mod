@@ -14,6 +14,7 @@ namespace Demo.Common.Systems
     public class ProgressionDataSystem : ModSystem
     {
         public static List<StageInfo> ProgressionData { get; private set; } // not needed maybe
+        public static Dictionary<(int, int), List<int>> ProgressionCache { get; private set; } // stageIndex, classIndex -> list of itemIDs
         public static Dictionary<string, int> ItemToIdMap { get; private set; } = new Dictionary<string, int>();
         public override void PostSetupContent()
         {
@@ -30,9 +31,38 @@ namespace Demo.Common.Systems
 
             // Deserialize the JSON into a list of StageInfo objects
             ProgressionData = JsonSerializer.Deserialize<List<StageInfo>>(json, options);
+            ProgressionCache = BuildCache();
 
-            GuideUISystem.SomethingUIStatic?.PopulateItems();
+            GuideUISystem.SomethingUIStatic?.PopulateItems(0, 0); // demoing class 0 and stage 0
  
+        }
+
+        // TODO: make the item calling recursive later - also save the box title as well
+        private Dictionary<(int, int), List<int>> BuildCache()
+        {
+            var cache = new Dictionary<(int, int), List<int>>();
+
+            if (ProgressionData == null || ProgressionData.Count == 0)
+                return cache;
+
+            for (int stageIndex = 0; stageIndex < ProgressionData.Count; stageIndex++)
+            {
+                var stage = ProgressionData[stageIndex];
+
+                for (int classIndex = 0; classIndex < stage.Classes.Count; classIndex++)
+                {
+                    var classInfo = stage.Classes[classIndex];
+                    var classList = new List<int>();
+                    cache[(stageIndex, classIndex)] = classList;
+
+                    foreach (var box in classInfo.Boxes)
+                    {
+                        classList.AddRange(box.Items);
+                    }
+                }
+            }
+
+            return cache;
         }
 
     }
