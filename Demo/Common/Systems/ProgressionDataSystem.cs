@@ -14,7 +14,7 @@ namespace Demo.Common.Systems
     public class ProgressionDataSystem : ModSystem
     {
         public static List<StageInfo> ProgressionData { get; private set; } // not needed maybe
-        public static Dictionary<(int, int), List<int>> ProgressionCache { get; private set; } // stageIndex, classIndex -> list of itemIDs
+        public static Dictionary<(int, int), List<InfoBox>> ProgressionCache { get; private set; } // stageIndex, classIndex -> list of itemIDs
         public static Dictionary<string, int> ItemToIdMap { get; private set; } = new Dictionary<string, int>();
         public override void PostSetupContent()
         {
@@ -38,9 +38,9 @@ namespace Demo.Common.Systems
         }
 
         // TODO: make the item calling recursive later - also save the box title as well
-        private Dictionary<(int, int), List<int>> BuildCache()
+        private Dictionary<(int, int), List<InfoBox>> BuildCache()
         {
-            var cache = new Dictionary<(int, int), List<int>>();
+            var cache = new Dictionary<(int, int), List<InfoBox>>();
 
             if (ProgressionData == null || ProgressionData.Count == 0)
                 return cache;
@@ -52,13 +52,11 @@ namespace Demo.Common.Systems
                 for (int classIndex = 0; classIndex < stage.Classes.Count; classIndex++)
                 {
                     var classInfo = stage.Classes[classIndex];
-                    var classList = new List<int>();
-                    cache[(stageIndex, classIndex)] = classList;
+                    var classList = new List<InfoBox>();
+                    classList.AddRange(classInfo.Boxes); // add the InfoBoxes for this class to the list
+                    cache[(stageIndex, classIndex)] = classList; // store the list of InfoBoxes for this class in the cache
 
-                    foreach (var box in classInfo.Boxes)
-                    {
-                        classList.AddRange(box.Items);
-                    }
+                    
                 }
             }
 

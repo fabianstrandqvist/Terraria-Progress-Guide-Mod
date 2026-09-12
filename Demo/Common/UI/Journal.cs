@@ -20,7 +20,7 @@ namespace Demo.Common.UI
         private UITextPanel<string> nextButton;
 
         public List<StageInfo> Data => ProgressionDataSystem.ProgressionData;
-        public Dictionary<(int, int), List<int>> Cache => ProgressionDataSystem.ProgressionCache;
+        public Dictionary<(int, int), List<InfoBox>> Cache => ProgressionDataSystem.ProgressionCache;
         private int stage;
         private int classIndex;
         private UITextPanel<string> classText;
@@ -74,26 +74,6 @@ namespace Demo.Common.UI
 
         }
 
-        private List<Item> GetItems(int stage, int classIndex)
-        {
-            var items = new List<Item>();
-
-            if (Cache == null || Cache.Count == 0)
-                return items;
-
-            foreach (int itemID in Cache[(stage, classIndex)])
-            {
-                
-                    Item item = new Item();
-                    item.SetDefaults(itemID);
-                    items.Add(item);
-                
-            }
-
-            return items;
-        }
-
-
 
         public void PopulateItems(int stage, int classIndex)
         {
@@ -108,7 +88,16 @@ namespace Demo.Common.UI
             // panel.Append(grid);
 
             itemList.Clear();
-            itemList.Add(new ItemGrid(GetItems(stage, classIndex)));
+            //itemList.Add(new ItemGrid(GetItems(stage, classIndex)));
+            foreach (var box in Cache[(stage, classIndex)])
+            {
+                var boxText = new UITextPanel<string>(box.Title);
+                boxText.Width.Set(0f, 1f);
+                boxText.Height.Set(20f, 0f);
+                itemList.Add(boxText);
+                itemList.Add(new ItemGrid(box.Items));
+            }
+            
         }
 
     }

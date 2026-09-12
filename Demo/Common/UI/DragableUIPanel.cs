@@ -29,14 +29,14 @@ namespace Demo.Common.UI
         private const float Padding = 4f;
         private const int ColumnsPerRow = 8;
 
-        public ItemGrid(List<Item> items)
+        public ItemGrid(List<int> itemIDs)
         {
-            for (int i = 0; i < items.Count; i++)
+            for (int i = 0; i < itemIDs.Count; i++)
             {
                 int row = i / ColumnsPerRow;
                 int col = i % ColumnsPerRow;
 
-                var slot = new ItemSlot(items[i]);
+                var slot = new ItemSlot(itemIDs[i]);
                 slot.Width.Set(SlotSize, 0f);
                 slot.Height.Set(SlotSize, 0f);
                 slot.Left.Set(col * (SlotSize + Padding), 0f);
@@ -44,7 +44,7 @@ namespace Demo.Common.UI
 
                 Append(slot);
             }
-            int rows = (items.Count + ColumnsPerRow - 1) / ColumnsPerRow;   // rounds up: 7 items -> 2 rows
+            int rows = (itemIDs.Count + ColumnsPerRow - 1) / ColumnsPerRow;   // rounds up: 7 items -> 2 rows
             Width.Set(0f, 1f);                                               // fill the list's width
             Height.Set(rows * (SlotSize + Padding), 0f); 
         }
@@ -54,8 +54,10 @@ namespace Demo.Common.UI
 	{
 		private Item item;
 
-		public ItemSlot(Item item)
+		public ItemSlot(int itemID)
 		{
+            Item item = new Item();
+            item.SetDefaults(itemID);
 			this.item = item;
 		}
 
