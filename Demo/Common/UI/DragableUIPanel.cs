@@ -27,7 +27,7 @@ namespace Demo.Common.UI
     {
         private const float SlotSize = 40f;
         private const float Padding = 4f;
-        private const int ColumnsPerRow = 6;
+        private const int ColumnsPerRow = 8;
 
         public ItemGrid(List<Item> items)
         {
@@ -44,6 +44,9 @@ namespace Demo.Common.UI
 
                 Append(slot);
             }
+            int rows = (items.Count + ColumnsPerRow - 1) / ColumnsPerRow;   // rounds up: 7 items -> 2 rows
+            Width.Set(0f, 1f);                                               // fill the list's width
+            Height.Set(rows * (SlotSize + Padding), 0f); 
         }
     }
 
